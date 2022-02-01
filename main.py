@@ -1,4 +1,3 @@
-from turtle import pos
 import disnake
 from disnake.ext import commands
 from disnake.utils import find
@@ -48,26 +47,26 @@ async def whitelist(ctx, value = ''):
         find = col.find({server_id:{"$exists":True}})
         for x in find:
             array = x[server_id]
-            original_data = {server_id: array}
-            if value in array:
-                await ctx.send('Already whitelisted')
-            else:
-                async def check():
-                    try:
-                        bot.get_user(value)
-                        return True
-                    except:
-                        return False
-                
-                if await check() == True:
-                    array.append(value)
-                    post = {
-                        "$set": {server_id: array}
-                    }
-                    col.update_one(original_data, post)
-                    await ctx.send('Whitelisted')
+            original_data = {server_id: list(array)}
+        if value in array:
+            await ctx.send('Already whitelisted')
+        else:
+            async def check():
+                a = await bot.fetch_user(value)
+                if a != None:
+                    return True
                 else:
-                    await ctx.send('Argument must be an id')
+                    return False
+            
+            if await check() == True:
+                array.append(value)
+                post = {
+                    "$set": {server_id: array}
+                }
+                col.update_one(original_data, post)
+                await ctx.send('Whitelisted')
+            else:
+                await ctx.send('Argument must be an id')
 
 discord_key = read_json["discord_key"]
 bot.run(discord_key)
