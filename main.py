@@ -39,6 +39,13 @@ async def check_if_registered_event(member):
         }
         col.insert_one(post)
 
+async def check(value):
+    a = await bot.fetch_user(value)
+    if a != None:
+        return True
+    else:
+        return False
+
 @bot.event
 async def on_member_join(member):
     await check_if_registered_event(member)
@@ -73,13 +80,6 @@ async def list(ctx):
         msg += f'{username} - {x}\n'
     await ctx.send(msg)
 
-async def check(value):
-    a = await bot.fetch_user(value)
-    if a != None:
-        return True
-    else:
-        return False
-
 @bot.command()
 @has_permissions(administrator=True)
 async def whitelist(ctx, value=''):
@@ -88,7 +88,7 @@ async def whitelist(ctx, value=''):
         await ctx.send('Command needs an argument (id)')
     else:
         server_id = str(ctx.message.guild.id)
-        find = col.find({server_id:{"$exists":True}})
+        find = col.find({server_id: {"$exists": True}})
         for x in find:
             array = x[server_id]
             original_data = {server_id: list(array)}
