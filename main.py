@@ -39,8 +39,7 @@ async def check_if_registered_event(member):
         col.insert_one(post)
 
 async def check(id):
-    a = await bot.fetch_user(id)
-    if a != None:
+    if await bot.fetch_user(id) != None:
         return True
     else:
         return False
@@ -73,11 +72,14 @@ async def list(ctx):
     find = col.find({server_id: {"$exists": True}})
     for x in find:
         id_array = x[server_id]
-    msg = ''
-    for x in id_array:
-        username = await bot.fetch_user(x)
-        msg += f'{username} - {x}\n'
-    await ctx.send(msg)
+    if len(id_array) != 0:
+        msg = ''
+        for x in id_array:
+            username = await bot.fetch_user(x)
+            msg += f'{username} - {x}\n'
+        await ctx.send(msg)
+    else:
+        await ctx.send('Noone is whitelisted')
 
 @bot.command()
 @has_permissions(administrator=True)
