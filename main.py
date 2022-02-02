@@ -4,7 +4,6 @@ from disnake.ext import commands
 from disnake.utils import find
 import json
 from pymongo import MongoClient
-import asyncio
 
 intents = disnake.Intents.default()
 intents.members = True
@@ -39,8 +38,8 @@ async def check_if_registered_event(member):
         }
         col.insert_one(post)
 
-async def check(value):
-    a = await bot.fetch_user(value)
+async def check(id):
+    a = await bot.fetch_user(id)
     if a != None:
         return True
     else:
@@ -61,9 +60,9 @@ async def on_member_join(member):
 @bot.command()
 async def help(ctx):
     embed = disnake.Embed(title="Help Commands", color=0xF3FF47)
-    embed.add_field(name="list", value="Shows list of whitelisted iD", inline=True)
-    embed.add_field(name="whitelist", value="Whitelists ID", inline=True)
-    embed.add_field(name="unwhitelist", value="Unwhitelists ID", inline=True)
+    embed.add_field(name="list", value="Shows list of whitelisted ID", inline=True)
+    embed.add_field(name="whitelist (User ID)", value="Whitelists ID", inline=True)
+    embed.add_field(name="unwhitelist (User ID)", value="Unwhitelists ID", inline=True)
     embed.set_footer(text="prefix = '$'")
     await ctx.send(embed=embed)
 
