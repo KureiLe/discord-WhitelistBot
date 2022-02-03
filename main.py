@@ -88,23 +88,23 @@ async def whitelist(ctx, value=''):
     if value == '':
         await ctx.send('Command needs an argument (id)')
     else:
-        server_id = str(ctx.message.guild.id)
-        find = col.find({server_id: {"$exists": True}})
-        for x in find:
-            array = x[server_id]
-            original_data = {server_id: list(array)}
-        if value in array:
-            await ctx.send('Already whitelisted')
-        else:
-            if await check(value) == True:
+        if await check(value) == True:
+            server_id = str(ctx.message.guild.id)
+            find = col.find({server_id: {"$exists": True}})
+            for x in find:
+                array = x[server_id]
+                original_data = {server_id: list(array)}
+            if value in array:
+                await ctx.send('Already whitelisted')
+            else:
                 array.append(value)
                 post = {
                     "$set": {server_id: array}
                 }
                 col.update_one(original_data, post)
                 await ctx.send('Whitelisted')
-            else:
-                await ctx.send('Argument must be an id')
+        else:
+            await ctx.send('Argument must be an id')
 @whitelist.error
 async def whitelist_error(ctx, error):
     if isinstance(error, MissingPermissions):
