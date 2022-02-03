@@ -85,26 +85,26 @@ async def list(ctx):
 @has_permissions(administrator=True)
 async def whitelist(ctx, value=''):
     await check_if_registered(ctx)
-    if value == '':
-        await ctx.send('Command needs an argument (id)')
-    else:
-        if await check(value) == True:
-            server_id = str(ctx.message.guild.id)
-            find = col.find({server_id: {"$exists": True}})
-            for x in find:
-                array = x[server_id]
-                original_data = {server_id: list(array)}
-            if value in array:
-                await ctx.send('Already whitelisted')
-            else:
+    server_id = str(ctx.message.guild.id)
+    try:
+        find = col.find({server_id: {"$exists": True}})
+        for x in find:
+            username = bot.fetch_user(value)
+            array = x[server_id]
+            original_array = list(array)
+
+        if value not in array:
+            if not await username == None:
                 array.append(value)
-                post = {
-                    "$set": {server_id: array}
-                }
-                col.update_one(original_data, post)
-                await ctx.send('Whitelisted')
+                post = {"$post": {server_id: value}}
+                await col.update_one({server_id: original_array}, post)
+                await ctx.send(bot.fetch_user(value), ' whitelisted')
+            else:
+                await ctx.send("That's not an id")
         else:
-            await ctx.send('Argument must be an id')
+            await ctx.send('Already whitelisted')
+    except:
+        await ctx.send('Error')
 @whitelist.error
 async def whitelist_error(ctx, error):
     if isinstance(error, MissingPermissions):
